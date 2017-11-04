@@ -1,0 +1,10 @@
+{
+	"elements":
+	[
+		{ "name": "Host",                 "type": "ValidationTextBox", "caption": "IP-Address/Host" }
+	],
+	"actions":
+	[
+		{ "type": "Button", "label": "Update",  "onClick": "Youless_Update($id);" }
+        ]
+}

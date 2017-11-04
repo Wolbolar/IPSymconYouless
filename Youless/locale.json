@@ -1,0 +1,17 @@
+{
+	"translations": {
+		"de": { 
+			"IP-Address": "IP-Adresse",
+			"current power": "Aktuelle Leistung",
+			"signal strength": "Signalstärke",
+			"counter state": "Zählerstatus ",
+			"counter reading": "Zählerstand",
+			"Update Interval Youless": "Update Intervall Youless",
+			"seconds": "Sekunden",
+			"ip address is not valid.": "IP Adresse ist nicht gültig.",
+			"Creating instance.": "Instanz wird erstellt",
+			"instance created.": "Instanz erstellt",
+			"interface closed.": "Schnittstelle geschlossen"
+		}
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"id": "{B72E3E8B-1139-5338-53D8-65533F6998F1}",
+	"name": "Youless",
+	"type": 3,
+	"vendor": "Youless",
+	"aliases": ["Youless LS120"],
+	"parentRequirements": [],
+	"childRequirements": [],
+	"implemented": [],
+	"prefix": "Youless"
+}
