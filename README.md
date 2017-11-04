@@ -43,7 +43,7 @@ In der _Modules_ Instanz rechts oben auf den Button __*Hinzufügen*__ drücken.
 In dem sich öffnenden Fenster folgende URL hinzufügen:
 
 	
-    `https://github.com/Git_Name/IPSymconYouless`  
+    `https://github.com/Wolbolar/IPSymconYouless`  
     
 und mit _OK_ bestätigen.    
         
