@@ -64,7 +64,7 @@ class Youless extends IPSModule
         }
     }
 
-    protected function GetState()
+    public function GetState()
     {
         $state = false;
         $ip = $this->ReadPropertyString("Host");
