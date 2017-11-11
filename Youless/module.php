@@ -58,10 +58,13 @@ class Youless extends IPSModule
             $json = fgets($handle, 10000);
             fclose($handle);
             $Meter = json_decode($json);
+            $this->SendDebug("Youless LS120:", "Data: ".$json,0);
             SetValue($this->GetIDForIdent("YoulessCounterReading"), floatval(str_replace(",", ".", $Meter->cnt)));
             SetValue($this->GetIDForIdent("YoulessCurrentPower"), intval($Meter->pwr));
             SetValue($this->GetIDForIdent("YoulessSignalStrength"), intval($Meter->lvl));
+            return $Meter;
         }
+        return false;
     }
 
     public function GetState()
