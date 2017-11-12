@@ -14,6 +14,7 @@ class Youless extends IPSModule
         $this->RegisterPropertyInteger("UpdateInterval", "15");
         $this->RegisterTimer('YoulessTimerUpdate', 15000, 'Youless_Update('.$this->InstanceID.');');
         $this->RegisterTimer('YoulessStatusUpdate', 5000, 'Youless_GetState('.$this->InstanceID.');');
+        $this->RegisterPropertyBoolean("show_S0", false);
     }
 
     public function ApplyChanges()
@@ -25,7 +26,15 @@ class Youless extends IPSModule
         $this->RegisterVariableInteger("YoulessCurrentPower", $this->Translate("current power"), "Youless.Watt", 2);
         $this->RegisterVariableInteger("YoulessSignalStrength", $this->Translate("signal strength"), "~Intensity.100", 3);
         $this->RegisterVariableBoolean("YoulessCounterState", $this->Translate("counter state"), "~Switch", 4);
-
+        $show_S0 = $this->ReadPropertyBoolean('show_S0');
+        if($show_S0)
+        {
+            $this->RegisterVariableInteger("YoulessS0Power", $this->Translate("S0 power"), "Youless.Watt", 5);
+        }
+        else
+        {
+            $this->UnregisterVariable("YoulessS0Power");
+        }
 
         $this->ValidateConfiguration();
     }
@@ -62,6 +71,11 @@ class Youless extends IPSModule
             SetValue($this->GetIDForIdent("YoulessCounterReading"), floatval(str_replace(",", ".", $Meter->cnt)));
             SetValue($this->GetIDForIdent("YoulessCurrentPower"), intval($Meter->pwr));
             SetValue($this->GetIDForIdent("YoulessSignalStrength"), intval($Meter->lvl));
+            $show_S0 = $this->ReadPropertyBoolean('show_S0');
+            if($show_S0)
+            {
+                SetValue($this->GetIDForIdent("YoulessS0Power"), intval($Meter->ps0));
+            }
             return $Meter;
         }
         return false;
@@ -184,6 +198,8 @@ class Youless extends IPSModule
                 { "name": "Host",                 "type": "ValidationTextBox", "caption": "IP-Address" },
                 { "type": "Label", "label": "Update Interval Youless" },
                 { "type": "IntervalBox", "name": "UpdateInterval", "caption": "seconds" },
+                { "type": "Label", "label": "Show S0 data" },
+		        { "type": "CheckBox", "name": "show_S0",  "caption": "S0 data" },
                 ';
 
         return $form;

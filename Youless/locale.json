@@ -2,7 +2,10 @@
 	"translations": {
 		"de": { 
 			"IP-Address": "IP-Adresse",
+			"Show S0 data": "S0 Daten anzeigen",
+			"S0 data": "S0 Daten",
 			"current power": "Aktuelle Leistung",
+			"S0 power": "S0 Leistung",
 			"signal strength": "Signalstärke",
 			"counter state": "Zählerstatus ",
 			"counter reading": "Zählerstand",

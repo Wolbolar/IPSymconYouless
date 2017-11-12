@@ -1,7 +1,11 @@
 {
 	"elements":
 	[
-		{ "name": "Host",                 "type": "ValidationTextBox", "caption": "IP-Address/Host" }
+		{ "name": "Host",                 "type": "ValidationTextBox", "caption": "IP-Address" },
+		{ "type": "Label", "label": "Update Interval Youless" },
+		{ "type": "IntervalBox", "name": "UpdateInterval", "caption": "seconds" },
+		{ "type": "Label", "label": "Show S0 data" },
+		{ "type": "CheckBox", "name": "show_S0",  "caption": "S0 data" }
 	],
 	"actions":
 	[
