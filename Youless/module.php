@@ -72,7 +72,7 @@ class Youless extends IPSModule
             SetValue($this->GetIDForIdent("YoulessCurrentPower"), intval($Meter->pwr));
             SetValue($this->GetIDForIdent("YoulessSignalStrength"), intval($Meter->lvl));
             $show_S0 = $this->ReadPropertyBoolean('show_S0');
-            if($show_S0)
+            if($show_S0 && (isset($Meter->ps0)))
             {
                 SetValue($this->GetIDForIdent("YoulessS0Power"), intval($Meter->ps0));
             }
