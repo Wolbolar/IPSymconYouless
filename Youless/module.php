@@ -1,8 +1,9 @@
-<?
+<?php
+
+declare(strict_types=1);
 
 class Youless extends IPSModule
 {
-
     public function Create()
     {
         //Never delete this line!
@@ -10,30 +11,30 @@ class Youless extends IPSModule
 
         //These lines are parsed on Symcon Startup or Instance creation
         //You cannot use variables here. Just static values.
-        $this->RegisterPropertyString("Host", "");
-        $this->RegisterPropertyInteger("UpdateInterval", "15");
-        $this->RegisterTimer('YoulessTimerUpdate', 15000, 'Youless_Update('.$this->InstanceID.');');
-        $this->RegisterTimer('YoulessStatusUpdate', 5000, 'Youless_GetState('.$this->InstanceID.');');
-        $this->RegisterPropertyBoolean("show_S0", false);
+        $this->RegisterPropertyString('Host', '');
+        $this->RegisterPropertyInteger('UpdateInterval', '15');
+        $this->RegisterTimer('YoulessTimerUpdate', 15000, 'Youless_Update(' . $this->InstanceID . ');');
+        $this->RegisterTimer('YoulessStatusUpdate', 5000, 'Youless_GetState(' . $this->InstanceID . ');');
+        $this->RegisterPropertyBoolean('show_S0', false);
     }
 
     public function ApplyChanges()
     {
         //Never delete this line!
         parent::ApplyChanges();
-        $this->RegisterVariableFloat("YoulessCounterReading", $this->Translate("counter reading"), "~Power", 1);
-        $this->RegisterProfileInteger("Youless.Watt", "Electricity", "", " Watt", 0, 0, 0, 0);
-        $this->RegisterVariableInteger("YoulessCurrentPower", $this->Translate("current power"), "Youless.Watt", 2);
-        $this->RegisterVariableInteger("YoulessSignalStrength", $this->Translate("signal strength"), "~Intensity.100", 3);
-        $this->RegisterVariableBoolean("YoulessCounterState", $this->Translate("counter state"), "~Switch", 4);
+        $this->RegisterVariableFloat('YoulessCounterReading', $this->Translate('counter reading'), '~Power', 1);
+        $this->RegisterProfileInteger('Youless.Watt', 'Electricity', '', ' Watt', 0, 0, 0, 0);
+        $this->RegisterVariableInteger('YoulessCurrentPower', $this->Translate('current power'), 'Youless.Watt', 2);
+        $this->RegisterVariableInteger('YoulessSignalStrength', $this->Translate('signal strength'), '~Intensity.100', 3);
+        $this->RegisterVariableBoolean('YoulessCounterState', $this->Translate('counter state'), '~Switch', 4);
         $show_S0 = $this->ReadPropertyBoolean('show_S0');
         if($show_S0)
         {
-            $this->RegisterVariableInteger("YoulessS0Power", $this->Translate("S0 power"), "Youless.Watt", 5);
+            $this->RegisterVariableInteger('YoulessS0Power', $this->Translate('S0 power'), 'Youless.Watt', 5);
         }
         else
         {
-            $this->UnregisterVariable("YoulessS0Power");
+            $this->UnregisterVariable('YoulessS0Power');
         }
 
         $this->ValidateConfiguration();
@@ -60,21 +61,21 @@ class Youless extends IPSModule
     public function Update()
     {
         $state = $this->GetState();
-        $ip = $this->ReadPropertyString("Host");
-        $url = "http://" . $ip . "/a?f=j";
+        $ip = $this->ReadPropertyString('Host');
+        $url = 'http://' . $ip . '/a?f=j';
         if ($state) {
-            $handle = fopen($url, "r");
+            $handle = fopen($url, 'r');
             $json = fgets($handle, 10000);
             fclose($handle);
             $Meter = json_decode($json);
-            $this->SendDebug("Youless LS120:", "Data: ".$json,0);
-            SetValue($this->GetIDForIdent("YoulessCounterReading"), floatval(str_replace(",", ".", $Meter->cnt)));
-            SetValue($this->GetIDForIdent("YoulessCurrentPower"), intval($Meter->pwr));
-            SetValue($this->GetIDForIdent("YoulessSignalStrength"), intval($Meter->lvl));
+            $this->SendDebug('Youless LS120:', 'Data: ' . $json, 0);
+            SetValue($this->GetIDForIdent('YoulessCounterReading'), floatval(str_replace(',', '.', $Meter->cnt)));
+            SetValue($this->GetIDForIdent('YoulessCurrentPower'), intval($Meter->pwr));
+            SetValue($this->GetIDForIdent('YoulessSignalStrength'), intval($Meter->lvl));
             $show_S0 = $this->ReadPropertyBoolean('show_S0');
             if($show_S0 && (isset($Meter->ps0)))
             {
-                SetValue($this->GetIDForIdent("YoulessS0Power"), intval($Meter->ps0));
+                SetValue($this->GetIDForIdent('YoulessS0Power'), intval($Meter->ps0));
             }
             return $Meter;
         }
@@ -84,19 +85,19 @@ class Youless extends IPSModule
     public function GetState()
     {
         $state = false;
-        $ip = $this->ReadPropertyString("Host");
-        if (!$ip == "")
+        $ip = $this->ReadPropertyString('Host');
+        if (!$ip == '')
         {
             $state = Sys_Ping($ip, 1000);
-            SetValueBoolean($this->GetIDForIdent("YoulessCounterState") , $state);
+            SetValueBoolean($this->GetIDForIdent('YoulessCounterState'), $state);
         }
         return $state;
     }
 
     protected function SetUpdateIntervall()
     {
-        $interval = ($this->ReadPropertyInteger("UpdateInterval"))*1000; // interval ms
-        $this->SetTimerInterval("YoulessTimerUpdate", $interval);
+        $interval = ($this->ReadPropertyInteger('UpdateInterval'))*1000; // interval ms
+        $this->SetTimerInterval('YoulessTimerUpdate', $interval);
     }
 
     protected function RegisterProfileInteger($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits)
@@ -107,7 +108,7 @@ class Youless extends IPSModule
         } else {
             $profile = IPS_GetVariableProfile($Name);
             if($profile['ProfileType'] != 1)
-                throw new Exception("Variable profile type does not match for profile ".$Name);
+                throw new Exception('Variable profile type does not match for profile ' . $Name);
         }
 
         IPS_SetVariableProfileIcon($Name, $Icon);
@@ -119,7 +120,7 @@ class Youless extends IPSModule
 
     protected function RegisterProfileIntegerAss($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Associations)
     {
-        if ( sizeof($Associations) === 0 ){
+        if (count($Associations) === 0){
             $MinValue = 0;
             $MaxValue = 0;
         }
@@ -139,7 +140,6 @@ class Youless extends IPSModule
 
     }
 
-
     protected function RegisterProfileFloat($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits)
     {
 
@@ -148,7 +148,7 @@ class Youless extends IPSModule
         } else {
             $profile = IPS_GetVariableProfile($Name);
             if($profile['ProfileType'] != 2)
-                throw new Exception("Variable profile type does not match for profile ".$Name);
+                throw new Exception('Variable profile type does not match for profile ' . $Name);
         }
 
         IPS_SetVariableProfileIcon($Name, $Icon);
@@ -160,7 +160,7 @@ class Youless extends IPSModule
 
     protected function RegisterProfileFloatAss($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Associations)
     {
-        if ( sizeof($Associations) === 0 ){
+        if (count($Associations) === 0){
             $MinValue = 0;
             $MaxValue = 0;
         }
@@ -187,9 +187,8 @@ class Youless extends IPSModule
         $formactions = $this->FormActions();
         $formelementsend = '{ "type": "Label", "label": "__________________________________________________________________________________________________" }';
         $formstatus = $this->FormStatus();
-        return	'{ '.$formhead.$formelementsend.'],'.$formactions.$formstatus.' }';
+        return	'{ ' . $formhead . $formelementsend . '],' . $formactions . $formstatus . ' }';
     }
-
 
     protected function FormHead()
     {
@@ -242,14 +241,14 @@ class Youless extends IPSModule
         return $form;
     }
 
-	//Add this Polyfill for IP-Symcon 4.4 and older
-	protected function SetValue($Ident, $Value)
-	{
+    //Add this Polyfill for IP-Symcon 4.4 and older
+    protected function SetValue($Ident, $Value)
+    {
 
-		if (IPS_GetKernelVersion() >= 5) {
-			parent::SetValue($Ident, $Value);
-		} else {
-			SetValue($this->GetIDForIdent($Ident), $Value);
-		}
-	}
+        if (IPS_GetKernelVersion() >= 5) {
+            parent::SetValue($Ident, $Value);
+        } else {
+            SetValue($this->GetIDForIdent($Ident), $Value);
+        }
+    }
 }
