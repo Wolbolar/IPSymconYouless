@@ -23,7 +23,7 @@ class Youless extends IPSModule
         //Never delete this line!
         parent::ApplyChanges();
         $this->RegisterVariableFloat('YoulessCounterReading', $this->Translate('counter reading'), '~Power', 1);
-		$this->RegisterProfile('Youless.Watt', 'Electricity', '', ' Watt', 0, 127, 1, 0, VARIABLETYPE_INTEGER);
+        $this->RegisterProfile('Youless.Watt', 'Electricity', '', ' Watt', 0, 127, 1, 0, VARIABLETYPE_INTEGER);
         $this->RegisterVariableInteger('YoulessCurrentPower', $this->Translate('current power'), 'Youless.Watt', 2);
         $this->RegisterVariableInteger('YoulessSignalStrength', $this->Translate('signal strength'), '~Intensity.100', 3);
         $this->RegisterVariableBoolean('YoulessCounterState', $this->Translate('counter state'), '~Switch', 4);
@@ -100,77 +100,77 @@ class Youless extends IPSModule
         $this->SetTimerInterval('YoulessTimerUpdate', $interval);
     }
 
-	//Profile
+    //Profile
 
-	/**
-	 * register profiles.
-	 *
-	 * @param $Name
-	 * @param $Icon
-	 * @param $Prefix
-	 * @param $Suffix
-	 * @param $MinValue
-	 * @param $MaxValue
-	 * @param $StepSize
-	 * @param $Digits
-	 * @param $Vartype
-	 */
-	protected function RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Vartype)
-	{
+    /**
+     * register profiles.
+     *
+     * @param $Name
+     * @param $Icon
+     * @param $Prefix
+     * @param $Suffix
+     * @param $MinValue
+     * @param $MaxValue
+     * @param $StepSize
+     * @param $Digits
+     * @param $Vartype
+     */
+    protected function RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Vartype)
+    {
 
-		if (!IPS_VariableProfileExists($Name)) {
-			IPS_CreateVariableProfile($Name, $Vartype); // 0 boolean, 1 int, 2 float, 3 string,
-		} else {
-			$profile = IPS_GetVariableProfile($Name);
-			if ($profile['ProfileType'] != $Vartype) {
-				$this->SendDebug('profile', 'Variable profile type does not match for profile ' . $Name, 0);
-			}
-		}
+        if (!IPS_VariableProfileExists($Name)) {
+            IPS_CreateVariableProfile($Name, $Vartype); // 0 boolean, 1 int, 2 float, 3 string,
+        } else {
+            $profile = IPS_GetVariableProfile($Name);
+            if ($profile['ProfileType'] != $Vartype) {
+                $this->SendDebug('profile', 'Variable profile type does not match for profile ' . $Name, 0);
+            }
+        }
 
-		IPS_SetVariableProfileIcon($Name, $Icon);
-		IPS_SetVariableProfileText($Name, $Prefix, $Suffix);
-		if ($Vartype != VARIABLETYPE_STRING) {
-			IPS_SetVariableProfileDigits($Name, $Digits); //  Nachkommastellen
-			IPS_SetVariableProfileValues(
-				$Name, $MinValue, $MaxValue, $StepSize
-			); // string $ProfilName, float $Minimalwert, float $Maximalwert, float $Schrittweite
-		}
-	}
+        IPS_SetVariableProfileIcon($Name, $Icon);
+        IPS_SetVariableProfileText($Name, $Prefix, $Suffix);
+        if ($Vartype != VARIABLETYPE_STRING) {
+            IPS_SetVariableProfileDigits($Name, $Digits); //  Nachkommastellen
+            IPS_SetVariableProfileValues(
+                $Name, $MinValue, $MaxValue, $StepSize
+            ); // string $ProfilName, float $Minimalwert, float $Maximalwert, float $Schrittweite
+        }
+    }
 
-	/**
-	 * register profile association.
-	 *
-	 * @param $Name
-	 * @param $Icon
-	 * @param $Prefix
-	 * @param $Suffix
-	 * @param $MinValue
-	 * @param $MaxValue
-	 * @param $Stepsize
-	 * @param $Digits
-	 * @param $Vartype
-	 * @param $Associations
-	 */
-	protected function RegisterProfileAssociation($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype, $Associations)
-	{
-		if (is_array($Associations) && count($Associations) === 0) {
-			$MinValue = 0;
-			$MaxValue = 0;
-		}
-		$this->RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype);
+    /**
+     * register profile association.
+     *
+     * @param $Name
+     * @param $Icon
+     * @param $Prefix
+     * @param $Suffix
+     * @param $MinValue
+     * @param $MaxValue
+     * @param $Stepsize
+     * @param $Digits
+     * @param $Vartype
+     * @param $Associations
+     */
+    protected function RegisterProfileAssociation($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype, $Associations)
+    {
+        if (is_array($Associations) && count($Associations) === 0) {
+            $MinValue = 0;
+            $MaxValue = 0;
+        }
+        $this->RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype);
 
-		if (is_array($Associations)) {
-			foreach ($Associations as $Association) {
-				IPS_SetVariableProfileAssociation($Name, $Association[0], $Association[1], $Association[2], $Association[3]);
-			}
-		} else {
-			$Associations = $this->$Associations;
-			foreach ($Associations as $code => $association) {
-				IPS_SetVariableProfileAssociation($Name, $code, $this->Translate($association), $Icon, -1);
-			}
-		}
+        if (is_array($Associations)) {
+            foreach ($Associations as $Association) {
+                IPS_SetVariableProfileAssociation($Name, $Association[0], $Association[1], $Association[2], $Association[3]);
+            }
+        } else {
+            $Associations = $this->$Associations;
+            foreach ($Associations as $code => $association) {
+                IPS_SetVariableProfileAssociation($Name, $code, $this->Translate($association), $Icon, -1);
+            }
+        }
 
-	}
+    }
 
     //Configuration Form
     public function GetConfigurationForm()
