@@ -69,14 +69,68 @@ class Youless extends IPSModule
             fclose($handle);
             $Meter = json_decode($json);
             $this->SendDebug('Youless LS120:', 'Data: ' . $json, 0);
-            SetValue($this->GetIDForIdent('YoulessCounterReading'), floatval(str_replace(',', '.', $Meter->cnt)));
-            SetValue($this->GetIDForIdent('YoulessCurrentPower'), intval($Meter->pwr));
-            SetValue($this->GetIDForIdent('YoulessSignalStrength'), intval($Meter->lvl));
-            $show_S0 = $this->ReadPropertyBoolean('show_S0');
+            $cnt = 0;
+            if(isset($Meter->cnt))
+			{
+				$cnt = floatval(str_replace(',', '.', $Meter->cnt));
+			}
+			if(isset($Meter->pwr))
+			{
+				$pwr = intval($Meter->pwr);
+				SetValue($this->GetIDForIdent('YoulessCurrentPower'), $pwr);
+			}
+			if(isset($Meter->lvl))
+			{
+				$lvl = intval($Meter->lvl);
+				SetValue($this->GetIDForIdent('YoulessSignalStrength'), $lvl);
+			}
+			if(isset($Meter->dev))
+			{
+				$dev = intval($Meter->dev);
+				$this->SendDebug('Youless LS120:', 'dev: ' . $dev, 0);
+			}
+			if(isset($Meter->det))
+			{
+				$det = intval($Meter->det);
+				$this->SendDebug('Youless LS120:', 'det: ' . $det, 0);
+			}
+			if(isset($Meter->con))
+			{
+				$con = intval($Meter->con);
+				$this->SendDebug('Youless LS120:', 'con: ' . $con, 0);
+			}
+			if(isset($Meter->sts))
+			{
+				$sts = intval($Meter->sts);
+				$this->SendDebug('Youless LS120:', 'sts: ' . $sts, 0);
+			}
+			$cs0 = 0;
+			if(isset($Meter->cs0))
+			{
+				$cs0 = floatval(str_replace(',', '.', $Meter->cs0));
+				$this->SendDebug('Youless LS120:', 'cs0: ' . $cs0, 0);
+			}
+            if($cnt == 0 && $cs0 > 0)
+			{
+				$counterreading = $cs0;
+			}
+            else
+			{
+				$counterreading = $cnt;
+			}
+			SetValue($this->GetIDForIdent('YoulessCounterReading'), $counterreading);
+
+			$show_S0 = $this->ReadPropertyBoolean('show_S0');
             if($show_S0 && (isset($Meter->ps0)))
             {
                 SetValue($this->GetIDForIdent('YoulessS0Power'), intval($Meter->ps0));
             }
+			if(isset($Meter->raw))
+			{
+				$raw = intval($Meter->raw);
+				$this->SendDebug('Youless LS120:', 'raw: ' . $raw, 0);
+			}
+
             return $Meter;
         }
         return false;
