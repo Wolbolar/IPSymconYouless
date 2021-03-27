@@ -1,9 +1,13 @@
 <?php
-
 declare(strict_types=1);
+
+require_once __DIR__ . '/../libs/ProfileHelper.php';
+require_once __DIR__ . '/../libs/ConstHelper.php';
 
 class Youless extends IPSModule
 {
+    use ProfileHelper;
+
     public function Create()
     {
         //Never delete this line!
@@ -151,150 +155,109 @@ class Youless extends IPSModule
     protected function SetUpdateIntervall()
     {
         $interval = ($this->ReadPropertyInteger('UpdateInterval'))*1000; // interval ms
+        $this->SendDebug('Youless LS120:', 'Set update interval to ' . $interval/1000 . 'seconds', 0);
         $this->SetTimerInterval('YoulessTimerUpdate', $interval);
     }
 
-    //Profile
-
     /**
-     * register profiles.
-     *
-     * @param $Name
-     * @param $Icon
-     * @param $Prefix
-     * @param $Suffix
-     * @param $MinValue
-     * @param $MaxValue
-     * @param $StepSize
-     * @param $Digits
-     * @param $Vartype
+     * build configuration form
+     * @return string
      */
-    protected function RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $StepSize, $Digits, $Vartype)
-    {
-
-        if (!IPS_VariableProfileExists($Name)) {
-            IPS_CreateVariableProfile($Name, $Vartype); // 0 boolean, 1 int, 2 float, 3 string,
-        } else {
-            $profile = IPS_GetVariableProfile($Name);
-            if ($profile['ProfileType'] != $Vartype) {
-                $this->SendDebug('profile', 'Variable profile type does not match for profile ' . $Name, 0);
-            }
-        }
-
-        IPS_SetVariableProfileIcon($Name, $Icon);
-        IPS_SetVariableProfileText($Name, $Prefix, $Suffix);
-        if ($Vartype != VARIABLETYPE_STRING) {
-            IPS_SetVariableProfileDigits($Name, $Digits); //  Nachkommastellen
-            IPS_SetVariableProfileValues(
-                $Name, $MinValue, $MaxValue, $StepSize
-            ); // string $ProfilName, float $Minimalwert, float $Maximalwert, float $Schrittweite
-        }
-    }
-
-    /**
-     * register profile association.
-     *
-     * @param $Name
-     * @param $Icon
-     * @param $Prefix
-     * @param $Suffix
-     * @param $MinValue
-     * @param $MaxValue
-     * @param $Stepsize
-     * @param $Digits
-     * @param $Vartype
-     * @param $Associations
-     */
-    protected function RegisterProfileAssociation($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype, $Associations)
-    {
-        if (is_array($Associations) && count($Associations) === 0) {
-            $MinValue = 0;
-            $MaxValue = 0;
-        }
-        $this->RegisterProfile($Name, $Icon, $Prefix, $Suffix, $MinValue, $MaxValue, $Stepsize, $Digits, $Vartype);
-
-        if (is_array($Associations)) {
-            foreach ($Associations as $Association) {
-                IPS_SetVariableProfileAssociation($Name, $Association[0], $Association[1], $Association[2], $Association[3]);
-            }
-        } else {
-            $Associations = $this->$Associations;
-            foreach ($Associations as $code => $association) {
-                IPS_SetVariableProfileAssociation($Name, $code, $this->Translate($association), $Icon, -1);
-            }
-        }
-
-    }
-
-    //Configuration Form
     public function GetConfigurationForm()
     {
-        $formhead = $this->FormHead();
-        $formactions = $this->FormActions();
-        $formelementsend = '{ "type": "Label", "label": "__________________________________________________________________________________________________" }';
-        $formstatus = $this->FormStatus();
-        return	'{ ' . $formhead . $formelementsend . '],' . $formactions . $formstatus . ' }';
+        // return current form
+        $Form = json_encode([
+            'elements' => $this->FormHead(),
+            'actions' => $this->FormActions(),
+            'status' => $this->FormStatus()
+        ]);
+        $this->SendDebug('FORM', $Form, 0);
+        $this->SendDebug('FORM', json_last_error_msg(), 0);
+        return $Form;
     }
 
+    /**
+     * return form configurations on configuration step
+     * @return array
+     */
     protected function FormHead()
     {
-        $form = '"elements":
+        $form = [
             [
-                { "name": "Host",                 "type": "ValidationTextBox", "caption": "IP-Address" },
-                { "type": "Label", "label": "Update Interval Youless" },
-                { "type": "IntervalBox", "name": "UpdateInterval", "caption": "seconds" },
-                { "type": "Label", "label": "Show S0 data" },
-		        { "type": "CheckBox", "name": "show_S0",  "caption": "S0 data" },
-                ';
-
+                'name' => 'Host',
+                'type' => 'ValidationTextBox',
+                'visible' => true,
+                'caption' => 'IP-Address'
+            ],
+            [
+                'name' => 'UpdateInterval',
+                'type' => 'NumberSpinner',
+                'visible' => true,
+                'caption' => 'Update Interval Youless',
+                'suffix' => 'seconds',
+                'min' => 10
+            ],
+            [
+                'name' => 'show_S0',
+                'type' => 'CheckBox',
+                'visible' => true,
+                'caption' => 'S0 data'
+            ]
+        ];
         return $form;
     }
 
+    /**
+     * return form actions by token
+     * @return array
+     */
     protected function FormActions()
     {
-        $form = '"actions":
-			[
-				{ "type": "Button", "label": "Update",  "onClick": "Youless_Update($id);" }
-			],';
-        return  $form;
-    }
-
-    protected function FormStatus()
-    {
-        $form = '"status":
+        $form = [
             [
-                {
-                    "code": 101,
-                    "icon": "inactive",
-                    "caption": "Creating instance."
-                },
-				{
-                    "code": 102,
-                    "icon": "active",
-                    "caption": "instance created."
-                },
-                {
-                    "code": 104,
-                    "icon": "inactive",
-                    "caption": "interface closed."
-                },
-                {
-                    "code": 203,
-                    "icon": "error",
-                    "caption": "ip address is not valid."
-                }
-            ]';
+                'type' => 'Button',
+                'visible' => true,
+                'caption' => 'Update',
+                'onClick' => 'Youless_Update($id);'
+            ]
+        ];
         return $form;
     }
 
-    //Add this Polyfill for IP-Symcon 4.4 and older
-    protected function SetValue($Ident, $Value)
+    /**
+     * return from status
+     * @return array
+     */
+    protected function FormStatus()
     {
+        $form = [
+            [
+                'code' => IS_CREATING,
+                'icon' => 'inactive',
+                'caption' => 'Creating instance.'
+            ],
+            [
+                'code' => IS_ACTIVE,
+                'icon' => 'active',
+                'caption' => 'configuration valid.'
+            ],
+            [
+                'code' => IS_INACTIVE,
+                'icon' => 'inactive',
+                'caption' => 'interface closed.'
+            ],
+            [
+                'code' => 201,
+                'icon' => 'inactive',
+                'caption' => 'Please follow the instructions.'
+            ],
+            [
+                'code' => 203,
+                'icon' => 'error',
+                'caption' => 'ip address is not valid.'
+            ]
+        ];
 
-        if (IPS_GetKernelVersion() >= 5) {
-            parent::SetValue($Ident, $Value);
-        } else {
-            SetValue($this->GetIDForIdent($Ident), $Value);
-        }
+        return $form;
     }
 }

@@ -11,11 +11,14 @@
 			"counter state": "Zählerstatus ",
 			"counter reading": "Zählerstand",
 			"Update Interval Youless": "Update Intervall Youless",
+			"Update": "Aktualisieren",
 			"seconds": "Sekunden",
 			"ip address is not valid.": "IP Adresse ist nicht gültig.",
 			"Creating instance.": "Instanz wird erstellt",
 			"instance created.": "Instanz erstellt",
-			"interface closed.": "Schnittstelle geschlossen"
+			"interface closed.": "Schnittstelle geschlossen",
+			"configuration valid.": "Konfiguration gültig.",
+			"Please follow the instructions.": "Bitte der Anleitung folgen."
 		}
 	}
 }
